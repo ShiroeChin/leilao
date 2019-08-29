@@ -7,6 +7,7 @@ import org.junit.Test;
 
 import br.edu.ifal.leilao.construtor.CriadorDeLeilao;
 import br.edu.ifal.leilao.construtor.CriadorDeUsuario;
+import br.edu.ifal.leilao.modelo.Lance;
 import br.edu.ifal.leilao.modelo.Leilao;
 import br.edu.ifal.leilao.modelo.Produto;
 import br.edu.ifal.leilao.modelo.Usuario;
@@ -103,5 +104,88 @@ public class TDDTest {
 		boolean validadeEsperada = true;
 		
 		assertEquals(validadeEsperada, validadeObtida);
+	}
+	
+	@Test
+	public void deveAceitaOPrimeiroLanceDoLeilao() {
+		
+		leilao = criadorDeLeilao.para(new Produto("Wacom Intuos")).constroi();
+		
+		Lance lance = new Lance(primeiroUsuario, 450);
+		
+		boolean aceitacaoObtida = avaliador.aceitaLance(leilao, lance);
+		boolean aceitacaoEsperada = true;
+		
+		assertEquals(aceitacaoEsperada, aceitacaoObtida);
+	}
+	
+	@Test
+	public void naoDeveAceitarDoisLancesSeguidosDoMesmoUsuarios(){
+		leilao = criadorDeLeilao.para(new Produto("Café"))
+				.lance(primeiroUsuario, 10).constroi();
+		
+		Lance lance = new Lance(primeiroUsuario, 10.5);
+		
+		boolean aceitacaoObtida = avaliador.aceitaLance(leilao, lance);
+		boolean aceitacaoEsperada = false;
+		
+		assertEquals(aceitacaoEsperada, aceitacaoObtida);
+	}
+	
+	@Test
+	public void deveAceitarDoisLancesSeguidosDeDoisUsuariosDiferentes() {
+		leilao = criadorDeLeilao.para(new Produto("Tv"))
+				.lance(primeiroUsuario, 600).constroi();
+		
+		Lance lance = new Lance(segundoUsuario, 610);
+		
+		boolean aceitacaoObtida = avaliador.aceitaLance(leilao, lance);
+		boolean aceitacaoEsperada = true;
+		
+		assertEquals(aceitacaoEsperada, aceitacaoObtida);
+	}
+	
+	@Test
+	public void naoDeveFuncionarComLancesValidosSeguidosDeLancesDoMesmoUsuario() {
+		leilao = criadorDeLeilao.para(new Produto("Tv"))
+				.lance(primeiroUsuario, 600)
+				.lance(segundoUsuario, 610)
+				.lance(terceiroUsuario, 620)
+				.constroi();
+		
+		Lance lance = new Lance(terceiroUsuario, 630);
+		
+		boolean aceitacaoObtida = avaliador.aceitaLance(leilao, lance);
+		boolean aceitacaoEsperada = false;
+		
+		assertEquals(aceitacaoEsperada, aceitacaoObtida);
+	}
+	
+	@Test
+	public void naoDeveAceitarUmLanceComValorMenorQueOUltimoLance() {
+		leilao = criadorDeLeilao.para(new Produto("Tv"))
+				.lance(primeiroUsuario, 600)
+				.constroi();
+		
+		Lance lance = new Lance(terceiroUsuario, 500);
+		
+		boolean aceitacaoObtida = avaliador.aceitaLance(leilao, lance);
+		boolean aceitacaoEsperada = false;
+		
+		assertEquals(aceitacaoEsperada, aceitacaoObtida);
+	}
+	
+	@Test
+	public void naoDeveAceitarUmNovoLanceComUmValorIgualAoUltimoLance() {
+		leilao = criadorDeLeilao.para(new Produto("Tv"))
+				.lance(primeiroUsuario, 600)
+				.constroi();
+		
+		Lance lance = new Lance(terceiroUsuario, 600);
+		
+		boolean aceitacaoObtida = avaliador.aceitaLance(leilao, lance);
+		boolean aceitacaoEsperada = false;
+		
+		assertEquals(aceitacaoEsperada, aceitacaoObtida);
 	}
 }

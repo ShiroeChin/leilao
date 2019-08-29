@@ -65,5 +65,25 @@ public class Avaliador {
 		}
 		return true;
 	}
+
+	public boolean aceitaLance(Leilao leilao, Lance lance) {
+		
+		if(leilao.getLances().isEmpty())
+			return true;
+		
+		int quantidadeDeLance = leilao.getLances().size();
+		Lance ultimoLance = leilao.getLances().get(quantidadeDeLance - 1);
+		
+		if(ultimoLance.getUsuario().equals(lance.getUsuario()) ||
+				ultimoLance.getValor() >= lance.getValor())
+			return false;
+		return true;
+	}
+
+	public boolean aceitarPrimeiroLance(Leilao leilao, Lance lance) {
+		if(leilao.getProduto().getValorInicial() <= lance.getValor())
+			return true;
+		return false;
+	}
 	
 }
